@@ -314,6 +314,7 @@ def a_40023255(self):
 &lt;html&gt;
 &lt;head&gt;
 40023255
+40023247
 &lt;head&gt;
 &lt;body&gt;
 &lt;br /&gt;&lt;a href="index"&gt;index&lt;/a&gt;&lt;br /&gt;
@@ -376,7 +377,7 @@ def spuraction1(self, N1=15, N2=24, M=5, P=15):
 </t>
 <t tx="2015.20150622215633.1">@cherrypy.expose
 # N 為齒數, M 為模數, P 為壓力角
-def drawspur1(self, N1=15, N2=24, M=5, P=15):
+def drawspur1(self, N1=15, N2=24, N3=15, N4=24, M=5, P=15):
     outstring = '''
 &lt;!DOCTYPE html&gt; 
 &lt;html&gt;
@@ -386,12 +387,16 @@ def drawspur1(self, N1=15, N2=24, M=5, P=15):
 &lt;body&gt;
     
 &lt;form method=POST action=drawspuraction1&gt;
-
+40023255&lt;br /&gt;
 齒數1:&lt;input type=text name=N1 value='''+str(N1)+'''&gt;&lt;br /&gt;
 齒數2:&lt;input type=text name=N2 value='''+str(N2)+'''&gt;&lt;br /&gt;
-(範圍:15~80)
+40023247&lt;br /&gt;
+齒數3:&lt;input type=text name=N3 value='''+str(N3)+'''&gt;&lt;br /&gt;
+齒數4:&lt;input type=text name=N4 value='''+str(N4)+'''&gt;&lt;br /&gt;
+
 
 &lt;input type=submit value=畫出正齒輪輪廓&gt;
+(範圍:15~80)
 &lt;/form&gt;
 &lt;br /&gt;&lt;a href="index"&gt;index&lt;/a&gt;&lt;br /&gt;
 &lt;!-- 載入 brython.js --&gt;
@@ -408,7 +413,7 @@ brython();
     return outstring</t>
 <t tx="2015.20150622215639.1">@cherrypy.expose
 # N 為齒數, M 為模數, P 為壓力角
-def drawspuraction1(self, N1=15, N2=24, M=5, P=15):
+def drawspuraction1(self, N1=15, N2=24, N3=15, N4=24, M=5, P=15):
     outstring = '''
 &lt;!DOCTYPE html&gt; 
 &lt;html&gt;
@@ -448,10 +453,14 @@ pa = '''+str(P)+'''
 # 齒輪齒數
 n_g1 = '''+str(N1)+'''
 n_g2 = '''+str(N2)+'''
+n_g3 = '''+str(N3)+'''
+n_g4 = '''+str(N4)+'''
 
 # 計算兩齒輪的節圓半徑
 rp_g1 = M*n_g1/2
 rp_g2 = M*n_g2/2
+rp_g3 = M*n_g3/2
+rp_g4 = M*n_g4/2
 
 # 繪圖第1齒輪的圓心座標
 x_g1 = 400
@@ -460,6 +469,14 @@ y_g1 = 400
 # 第2齒輪的圓心座標, 假設排列成水平, 表示各齒輪圓心 y 座標相同
 x_g2 = x_g1 
 y_g2 = y_g1+ rp_g1 + rp_g2
+
+x_g3 = x_g1 + rp_g2 + rp_g3
+y_g3 = y_g1 + rp_g1 + rp_g2
+
+x_g4 = x_g1 + rp_g2 + rp_g3
+y_g4 = y_g1 + rp_g1 + rp_g2 + rp_g3 + rp_g4
+
+
 
 # 將第1齒輪順時鐘轉 90 度
 # 使用 ctx.save() 與 ctx.restore() 以確保各齒輪以相對座標進行旋轉繪圖
@@ -482,6 +499,26 @@ ctx.rotate(-pi/n_g2)
 # put it back
 ctx.translate(-x_g2, -y_g2)
 spur.Spur(ctx).Gear(x_g2, y_g2, rp_g2, n_g2, pa, "green")
+ctx.restore()
+
+ctx.save()
+# translate to the origin of second gear
+ctx.translate(x_g3, y_g3)
+# rotate to engage
+ctx.rotate(-pi/2-pi/n_g3+(pi/2+pi/n_g2)*n_g2/n_g3)
+# put it back
+ctx.translate(-x_g3, -y_g3)
+spur.Spur(ctx).Gear(x_g3, y_g3, rp_g3, n_g3, pa, "red")
+ctx.restore()
+
+ctx.save()
+# translate to the origin of second gear
+ctx.translate(x_g4, y_g4)
+# rotate to engage
+ctx.rotate(-pi-pi/n_g4-(pi/2+pi/n_g3)*n_g3/n_g4+(pi/2+pi/n_g2)*n_g2/n_g4)
+# put it back
+ctx.translate(-x_g4, -y_g4)
+spur.Spur(ctx).Gear(x_g4, y_g4, rp_g4, n_g4, pa, "black")
 ctx.restore()
 
 &lt;/script&gt;
